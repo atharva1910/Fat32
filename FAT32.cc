@@ -1,3 +1,4 @@
+
 #include "FAT32.hpp"
 
 void reserve_table_space(std::ofstream &fp)
@@ -7,14 +8,14 @@ void reserve_table_space(std::ofstream &fp)
  * for the file tables 
  */
 {
-    const char c = 0;
+    fp.seekp(0, std::ios::beg);
+    const char c = 'a';
     for (int i = 0; i < 512+256; i++) {
         fp.write(&c, sizeof(c));
     }
-    
     // wirte the first freespace struct
     fp.seekp(512);
-    struct FreeSpace *temp = (struct FreeSpace *)malloc(sizeof(struct FreeSpace));
+    struct FreeSpace *temp = new struct FreeSpace;
     temp->pos = 512+257;
     temp->size = 20000;
     fp.write((char *)&temp->pos, sizeof(temp->pos));
@@ -32,35 +33,58 @@ bool check_if_empty(std::ifstream &fp)
     return (end == 0)? true : false;
 }
 
-void populate_file_struct(struct FileEntry *fe)
+size_t write_file_to_buffer()
 /*
- * Populate the file structure
- * so it can be stored in the
- * file table
+ * Create a buffer to write the file
+ * call function reserve_space to
+ * reserve the space on the memory block 
  */
 {
-    std::cout << "Enter name of the file" << "\n";
-    std::cin >> fe->name;
+    std::cout <<"Enter the contents of the file" << "\n";
+    char a;
+    while(std::cin >> a){
+        buffer.push_back(a);
+    }
+    return buffer.size();
+}
+
+void write_to_disk(size_t size, std::ofstream &fp)
+{
+    std::ifstream rp;
+    rp.open("Harddisk");
+    std::streampos pos;
+    rp.seekg(512, std::ios::beg);
+    char *reads = new char [sizeof(struct FreeSpace)];
+    rp.read(reads, sizeof(struct FreeSpace));
+    std::cout << "Reading  " << reads << "\n";
+    while(true);
+    /*
+    struct FreeSpace *file = (struct FreeSpace *)read;
+    std::cout << file->size  << "\n";
+    std::cout << file->pos << "\n";
+    fp.write((char *)&buffer, sizeof(buffer));
+    */
 }
 
 int main()
 {
     std::ofstream fp;
-    std::ifstream readFile;
     fp.open("Harddisk", std::ios::binary);
-    readFile.open("Harddisk");
-
-    if (check_if_empty(readFile)){
-            std::cout <<" Harddisk empty"  << "\n";
+    //    readFile.open("Harddisk", std::ios::binary);
+    //    if (check_if_empty(readFile))
             reserve_table_space(fp);
-    }
+
     int option;
     do{
         std::cout <<"1. Create file entry \n2. Delete file entry "  << "\n";
         std::cin >> option;
         switch(option){
         case 1:{
-
+            std::cout << "Enter the name of the file:"  << "\n";
+            struct FileEntry *temp = new struct FileEntry;
+            std::cin >> temp->name;
+            size_t size = write_file_to_buffer();
+            write_to_disk(size, fp);
         }break;
 
         case 2:{

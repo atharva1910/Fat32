@@ -2,14 +2,23 @@
 
 void reserve_table_space(std::ofstream &fp)
 /*
- * Clear the first 5n12bytes of the file
+ * Clear the first 512bytes of the file
+ * and next 256 for freespace bitmap
  * for the file tables 
  */
 {
     const char c = 0;
-    for (int i = 0; i < 512; i++) {
+    for (int i = 0; i < 512+256; i++) {
         fp.write(&c, sizeof(c));
     }
+    
+    // wirte the first freespace struct
+    fp.seekp(512);
+    struct FreeSpace *temp = (struct FreeSpace *)malloc(sizeof(struct FreeSpace));
+    temp->pos = 512+257;
+    temp->size = 20000;
+    fp.write((char *)&temp->pos, sizeof(temp->pos));
+    fp.write((char *)&temp->size, sizeof(temp->size));
 }
 
 bool check_if_empty(std::ifstream &fp)
@@ -38,7 +47,7 @@ int main()
 {
     std::ofstream fp;
     std::ifstream readFile;
-    fp.open("Harddisk", std::ios::binary|std::ios::app);
+    fp.open("Harddisk", std::ios::binary);
     readFile.open("Harddisk");
 
     if (check_if_empty(readFile)){

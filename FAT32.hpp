@@ -3,13 +3,13 @@
 
 struct FileEntry{
     char name[20]; // 20
-    unsigned int size; //4
+    uint64_t size;
     std::streampos pos;
 };
 
 struct FreeSpace{
-    uint64_t pos;
-    int size;
+    int pos;
+    uint64_t size;
 };
 
 int mount(char *,char *);

@@ -2,18 +2,16 @@
 #include <vector>
 #include <fstream>
 
+/*
+Table entry:      FreespaceEntry:
+name;             pos;
+pos;              size;
+size;
+
+ */
+
+
 std::vector<char> buffer;
-
-struct FileEntry{
-    char name[20]; // 20
-    uint64_t size;
-    std::streampos pos;
-};
-
-struct FreeSpace{
-    int pos;
-    uint64_t size;
-};
 
 int mount(char *,char *);
 
@@ -25,4 +23,8 @@ void populate_file_struct(struct FileEntry *);
 
 size_t write_file_to_buffer();
 
-void write_to_disk(size_t, std::ofstream&);
+unsigned int write_to_disk(size_t, std::ofstream&, std::ifstream&);
+
+void make_file_table(char *, size_t, unsigned int, std::ofstream&, std::ifstream&);
+
+void update_bitmap(unsigned int, size_t, size_t, std::ofstream&); 

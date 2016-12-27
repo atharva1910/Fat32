@@ -1,14 +1,8 @@
+#ifndef WRITING_HPP_
+#define WRITING_HPP_
+
 #include "main.hpp"
-/*
-Table entry:      FreespaceEntry:
-name;             pos;
-pos;              size;
-size;
 
- */
-
-
-std::vector<char> buffer;
 
 int mount(char *,char *);
 
@@ -25,3 +19,5 @@ unsigned int write_to_disk(size_t, std::ofstream&, std::ifstream&);
 void make_file_table(char *, size_t, unsigned int, std::ofstream&, std::ifstream&);
 
 void update_bitmap(unsigned int, size_t, size_t, std::ofstream&); 
+
+#endif

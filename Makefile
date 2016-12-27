@@ -1,10 +1,16 @@
 CC = g++
 ARGS = -Wall -g -o
 
-all: FAT32.hpp FAT32.o
-	$(CC) FAT32.o $(ARGS) FAT32
+all:Writing.o Reading.o	main.o
+	$(CC) main.o Writing.o Reading.o $(ARGS) FAT32
 
-FAT32.o:FAT32.cc FAT32.hpp
-	$(CC) -c -g FAT32.cc
+Writing.o:Writing.hpp main.hpp Writing.cc 
+	$(CC) -c  Writing.cc
+
+Reading.o:Reading.hpp main.hpp Reading.cc
+	$(CC) -c Reading.cc
+
+main.o:main.hpp main.cc
+	$(CC) -c main.cc
 clean:
 	rm -r *.o FAT32

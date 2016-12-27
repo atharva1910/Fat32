@@ -1,5 +1,7 @@
 #include "Writing.hpp"
 
+std::vector<char> buffer;
+
 void reserve_table_space(std::ofstream &fp)
 /*
  * Clear the first 512bytes of the file
@@ -16,8 +18,8 @@ void reserve_table_space(std::ofstream &fp)
 
     // wirte the first freespace struct
     fp.seekp(512);
-    int pos = 512+257;
-    int size = 20000;
+    unsigned int pos = 512+257;
+    unsigned int size = 20000;
     fp.write((char *)&pos, sizeof(pos));
     fp.write((char *)&size, sizeof(size));
     fp.flush();
@@ -59,17 +61,17 @@ unsigned int write_to_disk(size_t size, std::ofstream &fp, std::ifstream &rp)
         return 0;
     }
     rp.seekg(512, std::ios::beg);
-    unsigned int pos; size_t sizes;
+    unsigned int pos, sizes = 0;
     unsigned int bitmap_update_pos;
-    do{
-    bitmap_update_pos = rp.tellg();        
-    rp.read((char *)&pos, sizeof(pos));
-    rp.read((char *)&sizes, sizeof(sizes));
-    }while(sizes != 0 && sizes > size);
-    update_bitmap(bitmap_update_pos, size, sizes, fp);
-    fp.seekp(pos);
+    while(sizes == 0 && size > sizes){
+        bitmap_update_pos = rp.tellg();
+        rp.read((char *)&pos, sizeof(pos));
+        rp.read((char *)&sizes, sizeof(sizes));
+    }
+    fp.seekp(pos, std::ios::beg);
     fp.write((char *)&buffer, sizeof(buffer));
     fp.flush();
+    update_bitmap(bitmap_update_pos, size, sizes, fp);    
     return pos;
 }
 
@@ -104,12 +106,10 @@ void make_file_table(char *name, size_t size, unsigned int pos, std::ofstream &f
         rp.read(name_check, sizeof(name_check));
         rp.read((char *)&pos_check, sizeof(pos_check));
         rp.read((char *)&size_check, sizeof(size_check));
-    }while(name_check != NULL);
+    }while(!name_check);
     fp.seekp(fp_pos);
-    fp.write(name, sizeof(name));
+    fp.write(name, 20);
     fp.write((char *)&pos, sizeof(pos));
     fp.write((char *)&size, sizeof(size));
     fp.flush();
-    while(true);
 }
-

@@ -24,5 +24,6 @@ HardDisk layout:
     
 ####TODO:
   Delete entry.
+  
   Combine Free Spaces.
     

@@ -10,9 +10,7 @@ HardDisk layout:
   File Tables:
   
     Name.
-    
     Position.
-    
     Size.
     
     
@@ -22,7 +20,6 @@ HardDisk layout:
   FreeSpace:
   
     Position.
-    
     Size.
     
 ####TODO:

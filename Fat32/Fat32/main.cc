@@ -1,5 +1,6 @@
 #include "Reading.hpp"
 #include "Writing.hpp"
+#include "Delete.hpp"
 
 int main()
 {
@@ -11,7 +12,7 @@ int main()
             reserve_table_space(fp);
     int option;
     do{
-        std::cout <<"1. Create file entry \n2. Read file entry "  << "\n";
+        std::cout <<"1. Create file entry \n2. Read file entry\n3. Delete Entry\n4. Quit "  << "\n";
         scanf("%d",&option);
         switch(option){
         case 1:{
@@ -33,8 +34,21 @@ int main()
                 std::cout << "No such file";
             delete[] name; 
         }break;
+		case 3: {
+			std::cout << "Enter the name of the file to be deleted" << std::endl;
+			char *name = new char[20];
+			scanf("%s", name);
+			delete_spec result = search_for_file(name, rp);
+			if (result.table_pos) {
+				delete_file_entry(result.table_pos, fp);
+				add_size_to_bitmap(result.size, result.pos, fp, rp);
+			}
+			else
+				std::cout << "No such file"<< std::endl;
+			delete[] name;
+		}
         }
-    }while(option != 3);
+    }while(option != 4);
     fp.close();
     return 0;
 }

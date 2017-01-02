@@ -9,18 +9,19 @@ search_for_file(char *name, std::ifstream &rp)
 {
 	rp.seekg(0, std::ios::beg);
 	char *check_name = new char[20];
-	unsigned int size,pos;
+	unsigned int size,pos,table_pos;
 	do{
+		table_pos = rp.tellg();
 		rp.read((char *)&check_name, 20);
 		rp.read((char *)&pos, sizeof(pos));
 		rp.read((char *)&size, sizeof(int));
 	} while (strcmp(check_name, name) != 0 && rp.tellg() < 512);
-	if (rp.tellg() >= 512)
-		return 0;
-	delete_spec result;
-	result.size = size;
-	result.pos = pos;
-	result.table_pos = rp.tellg() - (sizeof(char[20]) + 2 * sizeof(int));
+	delete_spec result = {};
+	if (rp.tellg() <= 512) {
+		result.size = size;
+		result.pos = pos;
+		result.table_pos = table_pos;
+	}
 	return result;
 }
 
@@ -46,14 +47,16 @@ add_size_to_bitmap(unsigned int size, unsigned int pos, std::ofstream &fp, std::
 */
 {
 	rp.seekg(512, std::ios::beg);
-	unsigned int bitmap_position;
+	unsigned int bitmap_position,position;
 	do
 	{
-		rp.read((char *)&bitmap_position, sizeof(bitmap_position));
-		rp.seekg(rp.tellg() + sizeof(int), std::ios::beg);
-	} while (bitmap_position || rp.tellg < 728);
-
-	fp.seekp(rp.tellg() - 2 * sizeof(int), std::ios::beg);
+		bitmap_position = rp.tellg();
+		rp.read((char *)&position, sizeof(bitmap_position));
+		rp.seekg(bitmap_position + sizeof(int), std::ios::beg);
+	} while (position || bitmap_position < 728);
+// TODO : ADD CHECK AND MOVE SHIT AROUND HERE
+	fp.seekp(bitmap_position, std::ios::beg);
 	fp.write((char *)pos, sizeof(pos));
 	fp.write((char *)size, sizeof(size));
+	return true;
 }

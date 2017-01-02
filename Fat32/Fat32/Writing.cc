@@ -31,7 +31,7 @@ bool check_if_empty(std::ifstream &fp)
  */
 {
     fp.seekg(0, std::ios::end);
-    std::streampos end = fp.tellg();
+    unsigned int end = fp.tellg();
     return (end == 0)? true : false;
 }
 

@@ -23,7 +23,6 @@ HardDisk layout:
     Size.
     
 ####TODO:
-  Delete entry.
   
   Combine Free Spaces.
     
